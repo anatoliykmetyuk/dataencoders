@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 version = '0.1.0'
 
-setup(name='Data Encoders',
+setup(name='data-encoders',
       version=version,
       description='Tools to quickly encode and decode data for machine learning',
       author='Anatolii Kmetiuk',
