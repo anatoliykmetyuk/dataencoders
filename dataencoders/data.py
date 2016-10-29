@@ -2,6 +2,7 @@ import numpy as np
 
 CHAR_TO_ID = 'charToId'
 ID_TO_CHAR = 'idToChar'
+MASK       = 'mask'
 
 class CharEnc:
 
@@ -11,7 +12,8 @@ class CharEnc:
 
     self.charToId       = charMap[CHAR_TO_ID]
     self.idToChar       = charMap[ID_TO_CHAR]
-    self.embeddingLen   = len(self.charToId)
+    self.mask           = charMap[MASK      ]
+    self.embeddingLen   = len(self.charToId) + 1
 
   def addChar(self, char, id):
     newCTI = dict(self.charToId)
@@ -37,7 +39,8 @@ class CharEnc:
     res = []
     for sample in ids:
       txt = ""
-      for charId in sample: txt = txt + self.idToChar[charId]
+      for charId in sample:
+        if charId != self.mask: txt = txt + self.idToChar[charId]
       res.append(txt)
     return res
 
@@ -49,6 +52,8 @@ class CharEnc:
     for i in range(ids.shape[0]):
       for j in range(ids.shape[1]):
         res[i, j, ids[i, j]] = 1
+
+    res[:,:,self.mask] = self.mask
     return res
 
   def oneHotToId(self, oneHot):
@@ -56,7 +61,11 @@ class CharEnc:
     for i in range(oneHot.shape[0]):
       for j in range(oneHot.shape[1]):
         vec = oneHot[i,j]
-        res[i, j] = np.argmax(vec)
+        maybeOneHot = np.argmax(vec)
+        if vec[maybeOneHot] != self.mask:
+          res[i, j] = maybeOneHot
+        else:
+          res[i, j] = self.mask
     return res
 
 
@@ -67,8 +76,8 @@ class CharEnc:
 
 def charMap(text):
   chars = sorted(list(set(text)))
-  charToId = dict((c, i) for i, c in enumerate(chars))
-  idToChar = dict(enumerate(chars))
-  return {'charToId': charToId, 'idToChar': idToChar}
+  charToId = dict((c    , i + 1) for i, c in enumerate(chars))
+  idToChar = dict((i + 1, c    ) for i, c in enumerate(chars))
+  return {CHAR_TO_ID: charToId, ID_TO_CHAR: idToChar, MASK: 0}
 
 def charMapList(texts): return charMap("".join([row for row in texts]))

@@ -8,7 +8,7 @@ def test():
   np.set_printoptions(threshold=np.nan)
 
   originalText = ["Foo bar"]
-  converter    = CharEnc(charMapList(originalText), 10)
+  converter    = CharEnc(charMapList(originalText), 20)
   debug(converter.charMap, "Char map")
   debug(originalText, "Original text")
 
