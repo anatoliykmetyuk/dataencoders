@@ -53,7 +53,6 @@ class CharEnc:
       for j in range(ids.shape[1]):
         res[i, j, ids[i, j]] = 1
 
-    res[:,:,self.mask] = self.mask
     return res
 
   def oneHotToId(self, oneHot):
@@ -61,11 +60,7 @@ class CharEnc:
     for i in range(oneHot.shape[0]):
       for j in range(oneHot.shape[1]):
         vec = oneHot[i,j]
-        maybeOneHot = np.argmax(vec)
-        if vec[maybeOneHot] != self.mask:
-          res[i, j] = maybeOneHot
-        else:
-          res[i, j] = self.mask
+        res[i, j] = np.argmax(vec)
     return res
 
 
