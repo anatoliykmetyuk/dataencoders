@@ -4,6 +4,8 @@ import numpy as np
 Defines a pipeline to convert given data to Numpy array.
 '''
 
+identity = lambda x: x
+
 def process_array(arr, pipe, wrap_type, pipe_adapter, apply_pipe):
   '''
   :param arr: raw array to convert
@@ -12,9 +14,12 @@ def process_array(arr, pipe, wrap_type, pipe_adapter, apply_pipe):
     Can be `None` to indicate that the functions already return arrays, or can be set to the type
     of the array the results will be wrapped in. Useful when the functions return scalar results.
   '''
-  for f in pipe:
+  def step(arr, f, wrap_type, pipe_adapter, apply_pipe):
     if type(f) is tuple:
-      f, wrap_type = f
+      if   len(f) is 2: f, wrap_type = f
+      elif len(f) is 4:
+        f, wrap_type_tmp, pipe_adapter, apply_pipe = f
+        if wrap_type_tmp: wrap_type = wrap_type_tmp
 
     if wrap_type:
       g = lambda x: np.array([pipe_adapter(f)(x)], dtype=wrap_type)
@@ -24,20 +29,28 @@ def process_array(arr, pipe, wrap_type, pipe_adapter, apply_pipe):
     arr = apply_pipe(g, arr)
     if arr.shape[-1] is 1:
       arr = arr.reshape(arr.shape[:-1])
+    return arr
+
+  for f in pipe:
+    arr = step(arr, f, wrap_type, pipe_adapter, apply_pipe)
   return arr
 
 
 def process_array_by_axis(arr, pipe, wrap_type=None): return process_array(
   arr
 , pipe
-, pipe_adapter = lambda f: f
-, apply_pipe   = lambda f, arr: np.apply_along_axis(f, len(arr.shape) - 1, arr)
+, pipe_adapter = identity
+, apply_pipe   = axis_apply
 , wrap_type    = wrap_type)
 
 def process_array_by_elem(arr, pipe, wrap_type=None): return process_array(
   arr
 , pipe
 , pipe_adapter = lambda f: lambda x: f(x[0])
-, apply_pipe   = lambda f, arr: np.apply_along_axis(f, len(arr.shape), arr.reshape(arr.shape + (1,)))
+, apply_pipe   = elem_apply
 , wrap_type    = wrap_type
 )
+
+
+def axis_apply(f, arr): return np.apply_along_axis(f, len(arr.shape) - 1, arr)
+def elem_apply(f, arr): return np.apply_along_axis(f, len(arr.shape), arr.reshape(arr.shape + (1,)))
