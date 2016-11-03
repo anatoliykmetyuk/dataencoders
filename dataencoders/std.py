@@ -28,7 +28,14 @@ def chars(pad): return lambda s: pad(list(s))
 def join_chars(chars): return ''.join(chars)
 
 # Predicates
-non_empty = (lambda xs: [x for x in xs if x], None, identity, axis_apply)
+def filter(predicate, pad):
+  def f(xs):
+    res = [x for x in xs if predicate(x)]
+    res = pad(res)
+    return res
+  return (f, None, identity, axis_apply)
+  
+non_empty = filter(identity, identity)
 def filter_indices(ids): return (lambda xs: xs[ids], None, identity, axis_apply)
 
 # Other
