@@ -13,6 +13,9 @@ def process_array(arr, pipe, wrap_type, pipe_adapter, apply_pipe):
     of the array the results will be wrapped in. Useful when the functions return scalar results.
   '''
   for f in pipe:
+    if type(f) is tuple:
+      f, wrap_type = f
+
     if wrap_type:
       g = lambda x: np.array([pipe_adapter(f)(x)], dtype=wrap_type)
     else:
