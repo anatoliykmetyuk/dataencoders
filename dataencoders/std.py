@@ -28,10 +28,9 @@ def chars(pad): return lambda s: pad(list(s))
 def join_chars(chars): return ''.join(chars)
 
 # Predicates
-def func(xs):
-  print(xs)
-  return [x for x in xs if x]
 non_empty = (lambda xs: [x for x in xs if x], None, identity, axis_apply)
+def filter_indices(ids): return (lambda xs: xs[ids], None, identity, axis_apply)
 
 # Other
-lift_first_dim = (identity, None, identity, lambda _, arr: arr[0])
+lift_first_dim   = (identity, None, identity, lambda _, arr: arr[0])
+flatten_last_dim = (identity, None, identity, lambda _, arr: arr.reshape(arr.shape[:-2] + (arr.shape[-1] * arr.shape[-2],)))
