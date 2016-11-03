@@ -1,5 +1,5 @@
 import numpy as np
-from nparray import *
+from .nparray import *
 
 '''
 Defines a concpet of encoding cathegorical data into
@@ -35,6 +35,17 @@ class IdEncoder(Encoder):
   def decode(self, arr):
     return process_array_by_elem(arr, [lambda idx: self.id_to_obj[idx]], wrap_type=object)
 
+class OneHotEncoder(Encoder):
+
+  def encode(self, arr):
+    max_id = arr.flatten().max()
+    embeddings = np.eye(max_id + 1)
+    return process_array_by_elem(arr, [lambda idx: embeddings[idx]])
+
+  def decode(self, arr):
+    return process_array_by_axis(arr, [lambda ax: np.argmax(ax)], wrap_type=np.int)
+
+
 def map_array(arr, start=0):
   '''
   Creates a dictionary with int ids as keys and all the elements of
@@ -44,24 +55,3 @@ def map_array(arr, start=0):
   '''
   objs = list(set(arr.flatten()))
   return {i + start: obj for i, obj in enumerate(objs)}
-
-
-### TESTS ###
-
-def _test_map_array():
-  words = np.array(['Foo', 'Bar', 'Char'], dtype=object)
-  words = process_array_by_elem(words, [lambda x: np.array([x] * 10, dtype=object).reshape(10)])
-  print('Words', words)
-
-  mapping = map_array(words)
-  print('Mapping', mapping)
-
-  encoder = IdEncoder(mapping)
-
-  enc = encoder.encode(words)
-  print('Encoded', enc)
-
-  dec = encoder.decode(enc)
-  print('Decoded', dec)
-
-_test_map_array()
