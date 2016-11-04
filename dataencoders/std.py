@@ -26,6 +26,7 @@ def chars(pad): return lambda s: pad(list(s))
 
 # Folders
 def join_chars(chars): return ''.join(chars)
+flatten_last_dim = (identity, None, identity, lambda _, arr: arr.reshape(arr.shape[:-2] + (arr.shape[-1] * arr.shape[-2],)))
 
 # Predicates
 def filter(predicate, pad):
@@ -36,8 +37,11 @@ def filter(predicate, pad):
   return (f, None, identity, axis_apply)
   
 non_empty = filter(identity, identity)
+def word_char(pad): return filter(lambda s: s.isalnum() or s.isspace(), pad)
 def filter_indices(ids): return (lambda xs: xs[ids], None, identity, axis_apply)
 
+# Maps
+to_lowercase = lambda s: s.lower()
+
 # Other
-lift_first_dim   = (identity, None, identity, lambda _, arr: arr[0])
-flatten_last_dim = (identity, None, identity, lambda _, arr: arr.reshape(arr.shape[:-2] + (arr.shape[-1] * arr.shape[-2],)))
+lift_first_dim = (identity, None, identity, lambda _, arr: arr[0])
