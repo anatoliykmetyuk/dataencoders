@@ -2,6 +2,15 @@ import numpy as np
 import pickle
 import time
 
+def loadLines(fname):
+  with open(fname) as f:
+    content = f.readlines()
+    return np.array(content, dtype=object)
+
+def load(fname):
+  with open(fname) as f:
+    return f.read()
+
 def save_model(path_arr, path_ids, arr, mappings):
   with open(path_arr, 'wb') as f_arr, open(path_ids, 'wb') as f_ids:
     np.save(f_arr, arr)
