@@ -8,7 +8,7 @@ def save_model(path_arr, path_ids, arr, mappings):
     pickle.dump(mappings, f_ids)
 
 def load_model(path_arr, path_ids):
-  with open(path_arr) as f_arr, open(path_ids) as f_ids:
+  with open(path_arr, 'rb') as f_arr, open(path_ids, 'rb') as f_ids:
     return np.load(f_arr), pickle.load(f_ids)
 
 def benchmark(t, str=None):
@@ -21,3 +21,22 @@ def benchmark(t, str=None):
     print(str)
 
 def time_tracker(): return {'t': None}
+
+def shift(x, n): return np.concatenate((x[:,n:], x[:,-n:]), axis=1)
+
+def split_data(X, y, test_and_valid_size=[0.15, 0.15]):
+  size = len(X)
+  ids = np.arange(len(X))
+  np.random.shuffle(ids)
+  X = X[ids]
+  y = y[ids]
+
+  valid_size = int(test_and_valid_size[0] * size)
+  test_size  = int(test_and_valid_size[1] * size)
+
+  def sample_data(frm, to): return X[frm:to], y[frm:to]
+  X_test , y_test  = sample_data(0, test_size)
+  X_valid, y_valid = sample_data(test_size, test_size + valid_size)
+  X_train, y_train = sample_data(test_size + valid_size, size)
+
+  return X_train, y_train, X_valid, y_valid, X_test, y_test
