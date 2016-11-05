@@ -43,5 +43,11 @@ def filter_indices(ids): return (lambda xs: xs[ids], None, identity, axis_apply)
 # Maps
 to_lowercase = lambda s: s.lower()
 
+def flat_map(mapper): return lambda ax: np.concatenate([mapper(x) for x in ax], axis=0)
+
+# Json
+def json_array (name, pad=identity): return lambda x: pad(np.array(x[name], dtype=object))
+def json_object(name): return lambda x: x[name]
+
 # Other
 lift_first_dim = (identity, None, identity, lambda _, arr: arr[0])

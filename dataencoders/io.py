@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import pickle
+import json
 
 def loadLines(fname):
   with open(fname) as f:
@@ -10,6 +11,16 @@ def loadLines(fname):
 def load(fname):
   with open(fname) as f:
     return f.read()
+
+def load_json(fname, array=True):
+  with open(fname) as data_file:    
+    res = json.load(data_file)
+    if array:
+      return np.array(res)
+    else:
+      return res
+
+
 
 def save_model(paths, data, storages):
   for p, d, s in zip(paths, data, storages):
