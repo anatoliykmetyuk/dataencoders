@@ -45,6 +45,16 @@ class OneHotEncoder(Encoder):
   def decode(self, arr):
     return process_array_by_axis(arr, [lambda ax: np.argmax(ax)], wrap_type=np.int)
 
+class RealEncoder(Encoder):
+  def __init__(self, lower, upper):
+    self.lower = lower
+    self.upper = upper
+
+  def encode(self, arr): return process_array_by_elem(arr, [self.int_to_float], wrap_type=np.float)
+  def decode(self, arr): return process_array_by_elem(arr, [self.float_to_int], wrap_type=np.int  )
+
+  def int_to_float(self, x): return float(x - self.lower) / float(self.upper - self.lower)
+  def float_to_int(self, x): return int(x * float(self.upper - self.lower) + self.lower)
 
 def map_array(arr, start=0):
   '''
