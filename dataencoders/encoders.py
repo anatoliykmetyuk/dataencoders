@@ -54,7 +54,7 @@ class RealEncoder(Encoder):
   def decode(self, arr): return process_array_by_elem(arr, [self.float_to_int], wrap_type=np.int  )
 
   def int_to_float(self, x): return float(x - self.lower) / float(self.upper - self.lower)
-  def float_to_int(self, x): return int(x * float(self.upper - self.lower) + self.lower)
+  def float_to_int(self, x): return int(np.round((x * float(self.upper - self.lower) + self.lower)))
 
 def map_array(arr, start=0):
   '''
